@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 the original author or authors.
+ * Copyright 2016-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package org.springframework.cloud.deployer.resource.docker;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.net.URI;
@@ -28,10 +29,11 @@ import org.junit.Test;
  * Tests for the {@link DockerResource}.
  *
  * @author Thomas Risberg
+ * @author Chris Schaefer
  */
 public class DockerResourceTests {
 
-	String image = "sringcloud/hello-kube:latest";
+	String image = "springcloud/hello-kube:latest";
 
 	@Test
 	public void testResource() throws IOException, URISyntaxException {
@@ -47,6 +49,20 @@ public class DockerResourceTests {
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testInvalidUri() throws IOException, URISyntaxException {
-		DockerResource r = new DockerResource(URI.create("http:" + image));
+		new DockerResource(URI.create("http:" + image));
+	}
+
+	@Test
+	public void testParseImageName() {
+		DockerResource r = new DockerResource(image);
+		assertEquals("springcloud/hello-kube", r.getImageName());
+		assertEquals("latest", r.getImageTag());
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testParseInvalidImageName() {
+		DockerResource r = new DockerResource("springcloud/hello-kube");
+		assertEquals("springcloud/hello-kube", r.getImageName());
+		fail();
 	}
 }

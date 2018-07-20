@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 the original author or authors.
+ * Copyright 2016-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.springframework.util.Assert;
  * Note: {@link #getInputStream()} throws {@code UnsupportedOperationException}.
  *
  * @author Thomas Risberg
+ * @author Chris Schaefer
  */
 public class DockerResource extends AbstractResource {
 
@@ -75,4 +76,18 @@ public class DockerResource extends AbstractResource {
 		return uri;
 	}
 
+	public String getImageName() {
+		return parseImageUri()[0];
+	}
+
+	public String getImageTag() {
+		return parseImageUri()[1];
+	}
+
+	private String[] parseImageUri() {
+		String image = uri.getSchemeSpecificPart();
+		String[] imageParts = image.split(":");
+		Assert.isTrue(imageParts.length == 2, "Invalid image format, expected imageName:imageTag, got: " + image);
+		return imageParts;
+	}
 }
